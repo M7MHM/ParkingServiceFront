@@ -10,7 +10,6 @@ function pad(value: number): string {
   return String(value).padStart(2, "0");
 }
 
-/** Parses a .NET `TimeSpan` string (`[-][d.]hh:mm:ss[.fffffff]`) into seconds, or `null` if invalid. */
 export function timeSpanToSeconds(value: string): number | null {
   const match = TIME_SPAN_PATTERN.exec(value);
   if (!match) return null;
@@ -31,10 +30,6 @@ export function timeSpanToSeconds(value: string): number | null {
   return sign ? -total : total;
 }
 
-/**
- * Parses an `<input type="time">` style value (`HH:mm` or `HH:mm:ss`) into seconds since midnight.
- * `24:00` is accepted because the backend allows a closing time of exactly 24 hours.
- */
 export function parseTimeOfDay(value: string): number | null {
   const match = TIME_OF_DAY_PATTERN.exec(value);
   if (!match) return null;
@@ -48,7 +43,6 @@ export function parseTimeOfDay(value: string): number | null {
   return total <= SECONDS_PER_DAY ? total : null;
 }
 
-/** Formats a non-negative whole number of seconds as a .NET `TimeSpan` string. */
 export function secondsToTimeSpan(totalSeconds: number): string {
   const days = Math.floor(totalSeconds / SECONDS_PER_DAY);
   const remainder = totalSeconds % SECONDS_PER_DAY;

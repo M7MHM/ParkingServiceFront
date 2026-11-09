@@ -3,7 +3,6 @@ import { z } from "zod";
 import type { LoginRequest } from "../types";
 import { emailSchema, passwordRequiredSchema } from "./fields";
 
-/** Mirrors `LoginCommandValidator`. */
 export const loginSchema = z.object({
   email: emailSchema,
   password: passwordRequiredSchema,

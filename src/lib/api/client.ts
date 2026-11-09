@@ -10,20 +10,13 @@ import type { ProblemDetails } from "@/types/api";
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-
-/**
- * - `auto`: attach `Authorization: Bearer <jwt>` when the session cookie exists.
- * - `none`: never attach a token (anonymous endpoints such as login and register).
- */
 export type AuthMode = "auto" | "none";
 
 export interface ApiRequestOptions {
   method?: HttpMethod;
-  /** Serialized as JSON. */
   body?: unknown;
   auth?: AuthMode;
   headers?: HeadersInit;
-  /** Defaults to `no-store` unless `next` is provided, so per-user data is never cached. */
   cache?: RequestCache;
   next?: RequestInit["next"];
   signal?: AbortSignal;
@@ -42,10 +35,6 @@ interface ApiErrorInit {
   cause?: unknown;
 }
 
-/**
- * Lowercases the first letter of each dotted segment: the backend reports FluentValidation
- * failures as `Email` / `FullName`, while form fields are camelCase (`email` / `fullName`).
- */
 function toCamelCaseKey(key: string): string {
   return key.replace(
     /(^|\.)([A-Z])/g,
@@ -61,19 +50,12 @@ function normalizeFieldErrors(errors: Record<string, string[]>): Record<string, 
   }
   return normalized;
 }
-
-/**
- * Every failed request ends up here: an `application/problem+json` response from
- * `ApiExceptionMiddleware`, an empty-bodied response (e.g. 429 from the rate limiter),
- * a network failure or timeout (`status` 0), or a response that doesn't match its schema.
- */
 export class ApiError extends Error {
   readonly status: number;
   readonly title: string;
   readonly detail: string | null;
   readonly traceId: string | null;
   readonly problem: ProblemDetails | null;
-  /** Validation messages keyed by camelCase field name. Empty unless the API returned HTTP 400 with `errors`. */
   readonly fieldErrors: Record<string, string[]>;
 
   constructor(init: ApiErrorInit) {
@@ -208,17 +190,6 @@ async function parseSuccessBody<S extends z.ZodType>(
   return parsed.data;
 }
 
-/**
- * Sends a request to the Parking API.
- *
- * - With a `schema`, the JSON body is validated and returned fully typed.
- * - Without one (commands that answer `204 No Content`), the body is discarded and `void` is returned.
- * - Throws `ApiError` for every failure.
- *
- * Server-only: it reads the session cookie through `next/headers`, so importing it from a
- * Client Component fails the build. Because that read happens at request time, don't call
- * it from inside a `"use cache"` scope.
- */
 export async function apiRequest<S extends z.ZodType>(
   path: string,
   options: ApiRequestOptions & { schema: S },
@@ -261,8 +232,6 @@ export async function apiRequest(
   }
   return parseSuccessBody(response, options.schema);
 }
-
-/** Thin helpers over `apiRequest` for the common "send and parse the typed response" case. */
 export const apiClient = {
   get<S extends z.ZodType>(
     path: string,

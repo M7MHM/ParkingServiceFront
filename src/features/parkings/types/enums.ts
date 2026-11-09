@@ -10,7 +10,6 @@ export const SPOT_SIZES = [
 
 export type SpotSize = (typeof SPOT_SIZES)[number];
 
-/** Mirrors `ParkingBooking.Domain.Enums.SpotStatus`. */
 export const SPOT_STATUSES = [
   "Available",
   "Reserved",

@@ -19,7 +19,6 @@ export const registerResponseSchema = z.object({
   userId: guidSchema,
 }) satisfies z.ZodType<RegisterResponse>;
 
-/** Validates the decoded JWT payload. Signature verification is the backend's job. */
 export const accessTokenClaimsSchema = z.object({
   sub: guidSchema,
   email: z.string(),

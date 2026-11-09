@@ -13,10 +13,6 @@ export const SPOT_NUMBER_MAX_LENGTH = 50;
 
 export const spotSizeSchema = z.enum(SPOT_SIZES, { error: "Choose a spot size." });
 
-/**
- * Mirrors `AddSpotRequest` and the `ParkingSpot` entity rules. The spot number is required,
- * at most 50 characters, and unique inside its lot (enforced by the backend, reported as 409).
- */
 export const addSpotSchema = z.object({
   spotNumber: z
     .string({ error: "Spot number is required." })

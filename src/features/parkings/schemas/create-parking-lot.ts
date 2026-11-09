@@ -14,7 +14,6 @@ export const PARKING_LOT_NAME_MAX_LENGTH = 200;
 export const PARKING_LOT_DESCRIPTION_MAX_LENGTH = 1000;
 export const PARKING_LOT_ADDRESS_MAX_LENGTH = 500;
 
-/** Mirrors the `Location` value object: latitude in [-90, 90], longitude in [-180, 180]. */
 export const latitudeSchema = z
   .number({ error: "Latitude is required." })
   .min(-90, "Latitude must be between -90 and 90.")
@@ -25,10 +24,6 @@ export const longitudeSchema = z
   .min(-180, "Longitude must be between -180 and 180.")
   .max(180, "Longitude must be between -180 and 180.");
 
-/**
- * Mirrors `CreateParkingLotRequest` + `CreateParkingLotCommandValidator` + the `ParkingLot` entity rules.
- * Opening time is in [0h, 24h); closing time is after opening and at most 24h.
- */
 export const createParkingLotSchema = z
   .object({
     name: z

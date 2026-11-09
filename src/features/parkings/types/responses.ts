@@ -3,7 +3,6 @@ import type { Guid, IsoDateTime, Money, TimeSpan } from "@/types/common";
 import type { SpotStatus } from "./enums";
 import type { Location, SpotType } from "./value-objects";
 
-/** Response of `GET /api/parking-lots/{id}` (`ParkingLotResponse`). */
 export interface ParkingLotResponse {
   id: Guid;
   name: string;
@@ -17,8 +16,6 @@ export interface ParkingLotResponse {
   closingTime: TimeSpan;
   createdAt: IsoDateTime;
 }
-
-/** Item of `GET /api/parking-lots/{parkingLotId}/spots/available` (`ParkingSpotResponse`). */
 export interface ParkingSpotResponse {
   id: Guid;
   spotNumber: string;
@@ -28,13 +25,9 @@ export interface ParkingSpotResponse {
   currentBookingId: Guid | null;
   reservedUntil: IsoDateTime | null;
 }
-
-/** Response of `POST /api/parking-lots` (HTTP 201). */
 export interface CreateParkingLotResponse {
   id: Guid;
 }
-
-/** Response of `POST /api/parking-lots/{parkingLotId}/spots` (HTTP 201). */
 export interface AddSpotResponse {
   spotId: Guid;
   parkingLotId: Guid;

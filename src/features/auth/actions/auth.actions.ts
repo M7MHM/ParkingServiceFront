@@ -13,22 +13,13 @@ import type { LoginFormInput, RegisterFormInput } from "../schemas";
 const DEFAULT_REDIRECT_PATH = "/";
 const LOGIN_PATH = "/login";
 
-/**
- * What a form receives back when an action fails. Successful actions redirect,
- * so a UI only ever sees this shape (or `undefined` before the first submit).
- */
 export interface AuthFormError {
-  /** Human-readable summary: the API's `problem.detail`, or a client-side validation summary. */
   message: string;
-  /** Messages keyed by camelCase field name (`email`, `password`, `fullName`). */
   fieldErrors: Record<string, string[]>;
-  /** API trace id, useful to quote when reporting a server problem. */
   traceId: string | null;
-  /** Non-sensitive values to re-fill the form with. Passwords are never returned. */
   values: Partial<Record<"email" | "fullName", string>>;
 }
 
-/** The `prevState` argument of `useActionState`. */
 export type AuthActionState = AuthFormError | undefined;
 
 export type LoginActionInput = LoginFormInput & { redirectTo?: string };
@@ -36,7 +27,6 @@ export type RegisterActionInput = RegisterFormInput;
 
 type Attempt<T> = { ok: true; data: T } | { ok: false; error: ApiError };
 
-/** Turns an `ApiError` into a result; anything unexpected is rethrown for `error.tsx`. */
 async function attempt<T>(request: () => Promise<T>): Promise<Attempt<T>> {
   try {
     return { ok: true, data: await request() };
@@ -51,7 +41,6 @@ function readField(formData: FormData, name: string): string {
   return typeof value === "string" ? value : "";
 }
 
-/** Only same-origin paths are allowed, so a crafted `redirectTo` can't send users elsewhere. */
 function safeRedirectPath(path: string | undefined): string {
   if (!path || !path.startsWith("/") || path.startsWith("//") || path.startsWith("/\\")) {
     return DEFAULT_REDIRECT_PATH;
@@ -66,7 +55,6 @@ function describeApiError(error: ApiError): string {
   if (error.isNetworkError) {
     return error.title;
   }
-  // A 2xx response that failed schema validation: don't surface internal details.
   if (error.status < 400) {
     return "The server returned an unexpected response. Please try again.";
   }
@@ -97,10 +85,6 @@ function fromValidationError(error: z.ZodError, values: AuthFormError["values"])
   };
 }
 
-/**
- * Signs a user in. Accepts the `FormData` that `useActionState` passes, or a plain object
- * (for react-hook-form). Redirects to `redirectTo` (same-origin paths only) on success.
- */
 export async function loginAction(
   _previousState: AuthActionState,
   input: FormData | LoginActionInput,
@@ -125,11 +109,6 @@ export async function loginAction(
   redirect(safeRedirectPath(raw.redirectTo));
 }
 
-/**
- * Creates a `Customer` account, then signs in with the same credentials, because the register
- * endpoint returns only `{ userId }` and no token. If the account was created but the automatic
- * sign-in fails, the user is sent to the login page instead of being shown an error.
- */
 export async function registerAction(
   _previousState: AuthActionState,
   input: FormData | RegisterActionInput,
@@ -150,7 +129,7 @@ export async function registerAction(
   const registration = await attempt(() => register(parsed.data));
   if (!registration.ok) {
     const failure = fromApiError(registration.error, values);
-    // 409: the email is already registered. Show it next to the email field too.
+
     if (registration.error.isConflict && !failure.fieldErrors.email) {
       failure.fieldErrors = { ...failure.fieldErrors, email: [failure.message] };
     }
@@ -168,7 +147,6 @@ export async function registerAction(
   redirect(DEFAULT_REDIRECT_PATH);
 }
 
-/** Clears the session cookie and returns to the login page. Usable directly as a `<form action>`. */
 export async function logoutAction(): Promise<void> {
   await clearSessionToken();
   redirect(LOGIN_PATH);

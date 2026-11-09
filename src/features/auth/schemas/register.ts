@@ -3,7 +3,6 @@ import { z } from "zod";
 import type { RegisterRequest } from "../types";
 import { emailSchema, fullNameSchema, newPasswordSchema } from "./fields";
 
-/** Mirrors `RegisterCommandValidator`. */
 export const registerSchema = z.object({
   email: emailSchema,
   password: newPasswordSchema,

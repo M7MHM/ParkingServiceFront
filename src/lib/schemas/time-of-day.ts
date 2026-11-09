@@ -6,10 +6,6 @@ import {
   timeSpanToSeconds,
 } from "@/lib/utils/time-span";
 
-/**
- * Accepts an `<input type="time">` value (`HH:mm`, `HH:mm:ss`) or a .NET `TimeSpan`
- * string (including `1.00:00:00`) and always outputs a canonical `TimeSpan` string.
- */
 export const timeOfDaySchema = z
   .string({ error: "Time is required." })
   .trim()
