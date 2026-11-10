@@ -1,4 +1,4 @@
 export const PARKING_ROUTES = {
-  LIST: "/parking-lots",
-  DETAIL: (id: string) => `/parking-lots/${id}`,
+  LIST: "/parkings",
+  DETAIL: (id: string) => `/parkings/${id}`,
 } as const;

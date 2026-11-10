@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 
-export const SESSION_COOKIE_NAME = "parking_session";
+import { SESSION_COOKIE_NAME } from "./constants";
+
+export { SESSION_COOKIE_NAME };
 
 const ISO_OFFSET_SUFFIX = /(?:Z|[+-]\d{2}:\d{2})$/i;
 

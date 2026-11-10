@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { LoginForm } from "@/features/auth/components/login-form";
 
 export default function LoginPage() {
@@ -11,7 +12,9 @@ export default function LoginPage() {
           Manage your parking plans and bookings in one place.
         </p>
       </div>
-      <LoginForm />
+      <Suspense>
+        <LoginForm />
+      </Suspense>
       <p className="mt-6 text-center text-sm text-slate-600">
         New to Parking App?{" "}
         <Link href="/register" className="font-semibold text-blue-700 hover:text-blue-800">

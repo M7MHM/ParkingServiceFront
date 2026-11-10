@@ -1,11 +1,14 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
+import { REDIRECT_PARAM } from "@/lib/auth/constants";
 import { loginAction } from "../actions/auth.actions";
 import { SubmitButton } from "./submit-button";
 
 export function LoginForm() {
   const [state, formAction] = useActionState(loginAction, undefined);
+  const redirectTo = useSearchParams().get(REDIRECT_PARAM) ?? "";
   const emailError = state?.fieldErrors.email?.[0];
   const passwordError = state?.fieldErrors.password?.[0];
 
@@ -16,6 +19,8 @@ export function LoginForm() {
           {state.message}
         </p>
       )}
+
+      <input type="hidden" name="redirectTo" value={redirectTo} />
 
       <div>
         <label htmlFor="login-email" className="mb-2 block text-sm font-medium text-slate-800">

@@ -16,7 +16,7 @@ export default function HomePage() {
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Link
-              href="/parking-lots"
+              href="/parkings"
               className="inline-flex h-12 items-center justify-center rounded-xl bg-blue-500 px-6 text-sm font-semibold text-white transition hover:bg-blue-400"
             >
               Explore parking
