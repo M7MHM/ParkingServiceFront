@@ -4,7 +4,7 @@ import type { ApiError } from "@/lib/api/client";
 
 export type ActionResult<T = undefined> =
   | { success: true; data?: T }
-  | { success: false; error: string; fieldErrors?: Record<string, string[]> };
+  | { success: false; error: string; status?: number; fieldErrors?: Record<string, string[]> };
 
 export type ActionFailure = Extract<ActionResult, { success: false }>;
 
@@ -13,6 +13,7 @@ export function failureFromApiError(error: ApiError, message?: string): ActionFa
   return {
     success: false,
     error: message ?? error.detail ?? error.title,
+    status: error.status,
     ...(hasFieldErrors && { fieldErrors: error.fieldErrors }),
   };
 }

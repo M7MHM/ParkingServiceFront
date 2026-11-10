@@ -6,6 +6,9 @@ import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import type { ParkingLotResponse, ParkingSpotResponse } from "@/features/parkings/types";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { inputClass } from "@/components/ui/form-field";
 import { formatMoney, formatTimeSpan } from "@/lib/utils/format";
 
 import { createBookingAction } from "../actions/bookings.actions";
@@ -27,8 +30,6 @@ interface BookingFormProps {
 }
 
 const FORM_FIELDS = ["parkingSpotId", "startTime", "endTime", "notes"] as const;
-const inputClass =
-  "h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-100 aria-invalid:border-red-500";
 
 function isFormField(name: string): name is (typeof FORM_FIELDS)[number] {
   return (FORM_FIELDS as readonly string[]).includes(name);
@@ -58,6 +59,7 @@ export function BookingForm({ lot, spots }: BookingFormProps) {
     handleSubmit,
     control,
     setError,
+    resetField,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm<BookingFormValues>({
     resolver: zodResolver(schema),
@@ -89,20 +91,23 @@ export function BookingForm({ lot, spots }: BookingFormProps) {
 
     if (!result.success) {
       setFormError(result.error);
+      if (result.status === 409) {
+        // The spot was taken in the meantime: drop the selection and reload the available spots.
+        resetField("parkingSpotId");
+        router.refresh();
+      }
       for (const [field, messages] of Object.entries(result.fieldErrors ?? {})) {
         if (isFormField(field) && messages[0]) setError(field, { message: messages[0] });
       }
       return;
     }
-    router.push(BOOKING_ROUTES.LIST);
+    router.push(`${BOOKING_ROUTES.LIST}?booked=1`);
   });
 
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-8">
       {formError && (
-        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          {formError}
-        </p>
+        <Alert>{formError}</Alert>
       )}
 
       <SpotPicker spots={spots} registration={register("parkingSpotId")} error={errors.parkingSpotId?.message} />
@@ -185,13 +190,9 @@ export function BookingForm({ lot, spots }: BookingFormProps) {
             "Pick a spot and valid times to see the price."
           )}
         </p>
-        <button
-          type="submit"
-          disabled={isSubmitting || isSubmitSuccessful}
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-blue-700 px-6 text-sm font-semibold text-white transition hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-wait disabled:opacity-65"
-        >
+        <Button type="submit" loading={isSubmitting || isSubmitSuccessful} className="sm:min-w-44">
           {isSubmitting || isSubmitSuccessful ? "Booking…" : "Confirm booking"}
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -5,18 +5,22 @@ import { z } from "zod";
 import { ApiError } from "@/lib/api/client";
 import { guidSchema } from "@/lib/schemas/primitives";
 import {
+  addSpot,
   createParkingLot,
   deleteParkingLot,
+  deleteSpot,
   updateParkingLot,
+  updateSpot,
 } from "../api/parkings.service";
 import type { UpdateParkingLotInput } from "../api/parkings.service";
 import {
+  addSpotSchema,
   createParkingLotSchema,
   updateParkingLotSchema,
 } from "../schemas";
-import type { CreateParkingLotFormInput } from "../schemas";
-import type { CreateParkingLotResponse } from "../types";
-import { PARKING_ROUTES } from "../constants/routes";
+import type { AddSpotFormInput, CreateParkingLotFormInput } from "../schemas";
+import type { AddSpotResponse, CreateParkingLotResponse } from "../types";
+import { ADMIN_ROUTES, PARKING_ROUTES } from "../constants/routes";
 
 export type ParkingActionResult<T = undefined> =
   | { success: true; data?: T }
@@ -52,6 +56,15 @@ function failureFromValidation(error: z.ZodError): ParkingActionFailure {
   return { success: false, error: "Please correct the highlighted fields.", fieldErrors };
 }
 
+function revalidateLots(lotId?: string) {
+  revalidatePath(PARKING_ROUTES.LIST);
+  revalidatePath(ADMIN_ROUTES.LIST);
+  if (lotId) {
+    revalidatePath(PARKING_ROUTES.DETAIL(lotId));
+    revalidatePath(ADMIN_ROUTES.EDIT(lotId));
+  }
+}
+
 async function run<T>(request: () => Promise<T>): Promise<ParkingActionResult<T>> {
   try {
     return { success: true, data: await request() };
@@ -69,7 +82,7 @@ export async function createParkingLotAction(
 
   const result = await run(() => createParkingLot(parsed.data));
   if (result.success) {
-    revalidatePath(PARKING_ROUTES.LIST);
+    revalidateLots();
   }
   return result;
 }
@@ -86,8 +99,7 @@ export async function updateParkingLotAction(
 
   const result = await run(() => updateParkingLot(lotId.data, parsed.data));
   if (result.success) {
-    revalidatePath(PARKING_ROUTES.LIST);
-    revalidatePath(PARKING_ROUTES.DETAIL(lotId.data));
+    revalidateLots(lotId.data);
   }
   return result;
 }
@@ -98,8 +110,51 @@ export async function deleteParkingLotAction(id: string): Promise<ParkingActionR
 
   const result = await run(() => deleteParkingLot(lotId.data));
   if (result.success) {
-    revalidatePath(PARKING_ROUTES.LIST);
-    revalidatePath(PARKING_ROUTES.DETAIL(lotId.data));
+    revalidateLots(lotId.data);
   }
+  return result;
+}
+
+const INVALID_SPOT = { success: false, error: "Invalid parking spot." } as const;
+
+export async function addSpotAction(
+  lotId: string,
+  input: AddSpotFormInput,
+): Promise<ParkingActionResult<AddSpotResponse>> {
+  const lot = guidSchema.safeParse(lotId);
+  if (!lot.success) return { success: false, error: "Invalid parking lot." };
+
+  const parsed = addSpotSchema.safeParse(input);
+  if (!parsed.success) return failureFromValidation(parsed.error);
+
+  const result = await run(() => addSpot(lot.data, parsed.data));
+  if (result.success) revalidateLots(lot.data);
+  return result;
+}
+
+export async function updateSpotAction(
+  lotId: string,
+  spotId: string,
+  input: AddSpotFormInput,
+): Promise<ParkingActionResult<void>> {
+  const lot = guidSchema.safeParse(lotId);
+  const spot = guidSchema.safeParse(spotId);
+  if (!lot.success || !spot.success) return INVALID_SPOT;
+
+  const parsed = addSpotSchema.safeParse(input);
+  if (!parsed.success) return failureFromValidation(parsed.error);
+
+  const result = await run(() => updateSpot(lot.data, spot.data, parsed.data));
+  if (result.success) revalidateLots(lot.data);
+  return result;
+}
+
+export async function deleteSpotAction(lotId: string, spotId: string): Promise<ParkingActionResult<void>> {
+  const lot = guidSchema.safeParse(lotId);
+  const spot = guidSchema.safeParse(spotId);
+  if (!lot.success || !spot.success) return INVALID_SPOT;
+
+  const result = await run(() => deleteSpot(lot.data, spot.data));
+  if (result.success) revalidateLots(lot.data);
   return result;
 }

@@ -10,7 +10,6 @@ export function formatMoney({ amount, currency }: Money): string {
   }
 }
 
-/** `"08:00:00"` -> `"08:00"`. A full-day `"1.00:00:00"` -> `"24:00"`. */
 export function formatTimeSpan(value: string): string {
   const total = timeSpanToSeconds(value);
   if (total === null) return value;

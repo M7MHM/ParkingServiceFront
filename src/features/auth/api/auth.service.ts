@@ -1,4 +1,6 @@
 import { apiClient } from "@/lib/api/client";
+import { isMockApi } from "@/lib/api/mock-mode";
+import { mockLogin, mockRegister } from "@/mocks/auth.mock";
 
 import { loginResponseSchema, registerResponseSchema } from "../schemas";
 import type {
@@ -13,11 +15,13 @@ const AUTH_ENDPOINTS = {
   register: "/api/auth/register",
 } as const;
 
-export function login(request: LoginRequest): Promise<LoginResponse> {
+export async function login(request: LoginRequest): Promise<LoginResponse> {
+  if (isMockApi()) return mockLogin(request);
   return apiClient.post(AUTH_ENDPOINTS.login, loginResponseSchema, request, { auth: "none" });
 }
 
-export function register(request: RegisterRequest): Promise<RegisterResponse> {
+export async function register(request: RegisterRequest): Promise<RegisterResponse> {
+  if (isMockApi()) return mockRegister();
   return apiClient.post(AUTH_ENDPOINTS.register, registerResponseSchema, request, {
     auth: "none",
   });

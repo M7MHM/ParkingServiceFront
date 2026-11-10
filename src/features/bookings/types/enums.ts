@@ -1,4 +1,3 @@
-/** Mirrors `ParkingBooking.Domain.Enums.BookingStatus`. */
 export const BOOKING_STATUSES = [
   "Pending",
   "Confirmed",

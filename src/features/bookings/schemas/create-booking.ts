@@ -6,13 +6,9 @@ import type { CreateBookingRequest } from "../types";
 
 export const BOOKING_NOTES_MAX_LENGTH = 2000;
 
-/** The backend accepts a start up to one minute in the past (clock skew). */
 const START_TIME_TOLERANCE_MS = 60_000;
 
-/**
- * Mirrors `CreateBookingRequest` + `CreateBookingCommandValidator`.
- * `userId` is intentionally absent: the API takes it from the token.
- */
+
 export const createBookingSchema = z
   .object({
     parkingLotId: guidSchema,

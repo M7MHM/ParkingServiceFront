@@ -2,7 +2,6 @@ import type { Guid, IsoDateTime, Money } from "@/types/common";
 
 import type { BookingStatus } from "./enums";
 
-/** Response of `GET /api/bookings/{id}` (`BookingResponse`). */
 export interface BookingResponse {
   id: Guid;
   parkingSpotId: Guid;
@@ -15,7 +14,12 @@ export interface BookingResponse {
   createdAt: IsoDateTime;
 }
 
-/** Response of `POST /api/bookings` (HTTP 201). */
 export interface CreateBookingResponse {
   id: Guid;
+}
+
+export interface BookingSummary extends BookingResponse {
+  parkingLotId: Guid;
+  parkingLotName: string;
+  spotNumber: string;
 }

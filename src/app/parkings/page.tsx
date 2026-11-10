@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-
 import { ParkingLotList } from "@/features/parkings/components/parking-lot-list";
 import { ParkingLotListSkeleton } from "@/features/parkings/components/parking-lot-list-skeleton";
 
@@ -8,7 +7,6 @@ export const metadata: Metadata = {
   title: "Parking lots | Parking App",
   description: "Browse parking lots, compare prices and check availability.",
 };
-
 export default function ParkingLotsPage() {
   return (
     <main className="flex-1 bg-slate-50">

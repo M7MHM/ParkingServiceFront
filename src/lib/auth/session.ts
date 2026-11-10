@@ -1,6 +1,10 @@
 import { cookies } from "next/headers";
+import { cache } from "react";
+
+import type { UserRole } from "@/features/auth/types";
 
 import { SESSION_COOKIE_NAME } from "./constants";
+import { decodeAccessToken } from "./token";
 
 export { SESSION_COOKIE_NAME };
 
@@ -39,3 +43,16 @@ export async function clearSessionToken(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE_NAME);
 }
+
+export interface CurrentUser {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+}
+
+export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
+  const token = await getSessionToken();
+  const claims = token ? decodeAccessToken(token) : null;
+  return claims ? { id: claims.sub, email: claims.email, name: claims.name, role: claims.role } : null;
+});

@@ -13,10 +13,6 @@ function matchesPrefix(pathname: string, prefix: string): boolean {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 }
 
-/**
- * Optimistic gate: it only checks that a session cookie exists. The API still
- * validates the token on every call, so this is for UX, not for security.
- */
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const hasSession = Boolean(request.cookies.get(SESSION_COOKIE_NAME)?.value);

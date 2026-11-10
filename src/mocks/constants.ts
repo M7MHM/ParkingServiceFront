@@ -1,0 +1,3 @@
+export const DEMO_ADMIN_ID = "a0000000-0000-4000-8000-000000000001";
+export const DEMO_CUSTOMER_ID = "c0000000-0000-4000-8000-000000000002";
+export const DEMO_ADMIN_EMAIL = "admin@demo.com";

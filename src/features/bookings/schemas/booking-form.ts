@@ -5,7 +5,6 @@ import { formatTimeSpan } from "@/lib/utils/format";
 import { isWithinOpeningHours, parseDatetimeLocal } from "../utils/booking-time";
 import { BOOKING_NOTES_MAX_LENGTH } from "./create-booking";
 
-/** Same one-minute clock-skew allowance the backend validator uses. */
 const START_TOLERANCE_MS = 60_000;
 
 export interface OpeningHours {
@@ -13,10 +12,6 @@ export interface OpeningHours {
   closingTime: string;
 }
 
-/**
- * Client-side form schema. Values are the raw `datetime-local` strings; they are converted to
- * ISO instants on submit and then validated again by `createBookingSchema` on the server.
- */
 export function createBookingFormSchema(hours: OpeningHours) {
   return z
     .object({
